@@ -73,7 +73,7 @@ const style = StyleSheet.create({
     left: "50%",
     transform: [{ translateX: -20 }, { translateY: -10 }],
     backgroundColor: "#FFFFFF",
-    borderRadius: "50%",
+    borderRadius: 50,
   },
   imageWrapper: {
     width: 340,
