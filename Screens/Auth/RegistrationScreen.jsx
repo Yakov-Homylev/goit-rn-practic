@@ -54,7 +54,9 @@ export default function RegistrationScreen({ navigation }) {
         source={require("../../assets/background.png")}
         style={styles.container}
       >
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" && "padding"}>
+        <KeyboardAvoidingView
+          behavior={Platform.select({ android: undefined, ios: "padding" })}
+        >
           <View style={{ ...styles.contentWrapper }}>
             <View style={styles.imageWrapper}>
               <Image style={styles.avatar} resizeMode="cover" />
@@ -102,7 +104,7 @@ export default function RegistrationScreen({ navigation }) {
                 />
               </View>
             </View>
-            <View style={{ display: isKeyboardVisible ? "none" : "flex" }}>
+            <View>
               <TouchableOpacity
                 style={styles.submitBtn}
                 activeOpacity="0.5"
@@ -111,7 +113,10 @@ export default function RegistrationScreen({ navigation }) {
                 <Text style={styles.submitBtnText}>Зарегистрироваться</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.navigate}
+                style={{
+                  ...styles.navigate,
+                  display: isKeyboardVisible ? "none" : "flex",
+                }}
                 onPress={() => navigation.navigate("Login")}
               >
                 <Text>Уже есть аккаунт? Войти</Text>

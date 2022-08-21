@@ -1,10 +1,12 @@
 import { EvilIcons, MaterialIcons, Ionicons } from "@expo/vector-icons";
-import React from "react";
+import { Camera } from "expo-camera";
+import * as Location from "expo-location";
+import * as MediaLibrary from "expo-media-library";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   View,
   Text,
-  Image,
   TouchableOpacity,
   TextInput,
   KeyboardAvoidingView,
@@ -13,45 +15,103 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 
-export default function CreatePostsScreen() {
+const initialPostsState = {
+  image: "",
+  title: "",
+  location: "",
+  locationObj: {},
+  counter: "0",
+};
+
+export default function CreatePostsScreen({ navigation }) {
+  const [cameraRef, setCameraRef] = useState(null);
+  const [hasPermission, setHasPermission] = useState(null);
+  const [post, setPost] = useState(initialPostsState);
+  useEffect(() => {
+    (async () => {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      await MediaLibrary.requestPermissionsAsync();
+
+      setHasPermission(status === "granted");
+
+      const locationAccess = await Location.requestForegroundPermissionsAsync();
+
+      if (locationAccess.status !== "granted") {
+        console.log("Access denied");
+      }
+
+      const { coords } = await Location.getCurrentPositionAsync({});
+      setPost({ ...post, locationObj: coords });
+    })();
+  }, []);
+
+  const photoSnap = async () => {
+    const { uri } = await cameraRef.takePictureAsync();
+    setPost({ ...post, image: uri });
+  };
+
+  const publicPhoto = () => {
+    navigation.navigate("DefaultPosts", post);
+    setPost(initialPostsState);
+  };
+
   return (
-    <View style={style.container}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={style.imageUploadContainer}>
-          <Image
-            source={require("../../assets/icon.png")}
-            style={style.imageWrapper}
-          />
-          <TouchableOpacity style={style.uploadImageButton}>
-            <MaterialIcons name="photo-camera" size={24} color="black" />
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={style.container}>
+        {hasPermission ? (
+          <Camera
+            style={style.imageUploadContainer}
+            ref={ref => setCameraRef(ref)}
+          >
+            <TouchableOpacity
+              style={style.uploadImageButton}
+              onPress={photoSnap}
+            >
+              <MaterialIcons name="photo-camera" size={24} color="black" />
+            </TouchableOpacity>
+          </Camera>
+        ) : (
+          <View />
+        )}
+        {post.image ? (
+          <Text style={style.imageInfo}>Опубликуйте фото</Text>
+        ) : (
+          <Text style={style.imageInfo}>Загрузите фото</Text>
+        )}
+        <KeyboardAvoidingView
+          behavior={Platform.select({ android: undefined, ios: "padding" })}
+        >
+          <View style={{ marginTop: 48, marginBottom: 32 }}>
+            <TextInput
+              placeholder="Название..."
+              style={{ ...style.input, paddingLeft: 0 }}
+              value={post.title}
+              onChangeText={value => setPost({ ...post, title: value })}
+            />
+          </View>
+          <View>
+            <EvilIcons
+              style={{ position: "relative", top: 8 }}
+              name="location"
+              size={24}
+              color="#BDBDBD"
+            />
+            <TextInput
+              placeholder="Местность..."
+              style={style.input}
+              value={post.location}
+              onChangeText={value => setPost({ ...post, location: value })}
+            />
+          </View>
+          <TouchableOpacity style={style.btn} onPress={publicPhoto}>
+            <Text style={style.btnText}>Опубликовать</Text>
           </TouchableOpacity>
-        </View>
-      </TouchableWithoutFeedback>
-      <Text style={style.imageInfo}>Загрузите фото</Text>
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" && "padding"}>
-        <View style={{ marginTop: 48, marginBottom: 32 }}>
-          <TextInput
-            placeholder="Название..."
-            style={{ ...style.input, paddingLeft: 0 }}
-          />
-        </View>
-        <View>
-          <EvilIcons
-            style={{ position: "relative", top: 8 }}
-            name="location"
-            size={24}
-            color="#BDBDBD"
-          />
-          <TextInput placeholder="Местность..." style={style.input} />
-        </View>
-        <TouchableOpacity style={style.btn}>
-          <Text style={style.btnText}>Опубликовать</Text>
+        </KeyboardAvoidingView>
+        <TouchableOpacity style={style.deleteBtn}>
+          <Ionicons name="trash-outline" size={24} color="#BDBDBD" />
         </TouchableOpacity>
-      </KeyboardAvoidingView>
-      <TouchableOpacity style={style.deleteBtn}>
-        <Ionicons name="trash-outline" size={24} color="#BDBDBD" />
-      </TouchableOpacity>
-    </View>
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -66,19 +126,18 @@ const style = StyleSheet.create({
   imageUploadContainer: {
     alignSelf: "center",
     position: "relative",
+    width: 340,
+    height: 240,
+    borderRadius: 8,
   },
   uploadImageButton: {
     position: "absolute",
     top: "50%",
     left: "50%",
-    transform: [{ translateX: -20 }, { translateY: -10 }],
+    transform: [{ translateX: -30 }, { translateY: -30 }],
     backgroundColor: "#FFFFFF",
     borderRadius: 50,
-  },
-  imageWrapper: {
-    width: 340,
-    height: 240,
-    borderRadius: 8,
+    padding: 20,
   },
   imageInfo: {
     color: "#BDBDBD",

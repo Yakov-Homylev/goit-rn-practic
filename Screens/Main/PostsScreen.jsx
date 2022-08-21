@@ -1,62 +1,35 @@
+import { MaterialIcons } from "@expo/vector-icons";
+import { createStackNavigator } from "@react-navigation/stack";
 import React from "react";
-import { StyleSheet, View, ScrollView } from "react-native";
 
-import ProfileCard from "../../components/Content/ProfileCard";
-import SmallProfile from "../../components/User/SmallProfile";
+import CommentsScreen from "./NestedScreens/CommentsScreen";
+import DefaultPostsScreen from "./NestedScreens/DefaultPostsScreen";
+import MapScreen from "./NestedScreens/MapScreen";
 
-const mockData = [
-  {
-    title: "Forest",
-    counter: "1",
-    location: "Deutschland",
-    image: require("../../assets/img1.png"),
-  },
-  {
-    title: "Sunset",
-    counter: "2",
-    location: "Deutschland",
-    image: require("../../assets/img2.png"),
-  },
-  {
-    title: "Door",
-    counter: "3",
-    location: "Italy",
-    image: require("../../assets/img3.png"),
-  },
-];
+const NestedStack = createStackNavigator();
 
 export default function PostsScreen() {
   return (
-    <View style={style.container}>
-      <SmallProfile />
-      <ScrollView style={style.contentWrapper}>
-        {mockData.length > 0
-          ? mockData.map(({ title, counter, location, image }, idx, arr) => (
-              <ProfileCard
-                key={title}
-                title={title}
-                counter={counter}
-                location={location}
-                image={image}
-                lastComponent={!!(arr.length - 1 === idx)}
-              />
-            ))
-          : null}
-      </ScrollView>
-    </View>
+    <NestedStack.Navigator>
+      <NestedStack.Screen
+        component={DefaultPostsScreen}
+        name="DefaultPosts"
+        options={({ navigation }) => ({
+          title: "Публикации",
+          headerRight: () => (
+            <MaterialIcons
+              onPress={() => navigation.navigate("Login")}
+              name="logout"
+              size={24}
+              color="black"
+              style={{ marginRight: 20 }}
+            />
+          ),
+          headerLeft: () => null,
+        })}
+      />
+      <NestedStack.Screen component={MapScreen} name="Map" />
+      <NestedStack.Screen component={CommentsScreen} name="Comments" />
+    </NestedStack.Navigator>
   );
 }
-
-const style = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 32,
-    paddingBottom: 10,
-    backgroundColor: "#FFFFFF",
-  },
-  contentWrapper: {
-    marginTop: 32,
-    flexDirection: "column",
-  },
-});

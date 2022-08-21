@@ -1,4 +1,4 @@
-import { Ionicons, AntDesign, MaterialIcons } from "@expo/vector-icons";
+import { Ionicons, AntDesign } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React from "react";
 
@@ -49,17 +49,9 @@ export default function HomeScreen() {
       <MainTabs.Screen
         name="Posts"
         component={PostsScreen}
-        options={({ navigation }) => ({
+        options={() => ({
           title: "Публикации",
-          headerRight: () => (
-            <MaterialIcons
-              onPress={() => navigation.navigate("Login")}
-              name="logout"
-              size={24}
-              color="black"
-              style={{ marginRight: 20 }}
-            />
-          ),
+          headerShown: false,
         })}
       />
       <MainTabs.Screen

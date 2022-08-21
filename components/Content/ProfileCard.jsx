@@ -1,6 +1,6 @@
 import { EvilIcons } from "@expo/vector-icons";
 import React from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 
 export default function ProfileCard({
   title = "Title",
@@ -8,12 +8,14 @@ export default function ProfileCard({
   location,
   image,
   lastComponent = false,
+  onCommentClick = () => {},
+  onLocationClick = () => {},
 }) {
   return (
     <View style={{ ...style.card, marginBottom: lastComponent ? 0 : 34 }}>
       <View>
         {image ? (
-          <Image source={image} style={style.image} />
+          <Image source={{ uri: image }} style={style.image} />
         ) : (
           <Image
             source={require("../../assets/img1.png")}
@@ -24,11 +26,17 @@ export default function ProfileCard({
       <Text style={style.title}>{title}</Text>
       <View style={style.bottomPanel}>
         <View style={style.iconWrapper}>
-          <EvilIcons name="comment" size={24} color="#BDBDBD" />
+          <TouchableOpacity onPress={onCommentClick}>
+            <EvilIcons name="comment" size={24} color="#BDBDBD" />
+          </TouchableOpacity>
           <Text style={style.counter}>{counter}</Text>
         </View>
         <View style={style.iconWrapper}>
-          <EvilIcons name="location" size={24} color="#BDBDBD" />
+          <TouchableOpacity
+            onPress={() => onLocationClick({ location, title })}
+          >
+            <EvilIcons name="location" size={24} color="#BDBDBD" />
+          </TouchableOpacity>
           <Text style={style.locationText}>{location}</Text>
         </View>
       </View>
@@ -43,6 +51,9 @@ const style = StyleSheet.create({
   image: {
     alignSelf: "center",
     borderRadius: 8,
+    flex: 1,
+    minWidth: "100%",
+    minHeight: 200,
   },
   title: {
     marginTop: 8,

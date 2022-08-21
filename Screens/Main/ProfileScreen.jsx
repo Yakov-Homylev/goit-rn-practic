@@ -41,7 +41,7 @@ export default function ProfileScreen({ navigation }) {
               />
             </View>
             <Text style={style.title}>Name</Text>
-            <View>
+            <View style={style.postsWrapper}>
               <ProfileCard />
               <ProfileCard />
               <ProfileCard />
@@ -102,5 +102,8 @@ const style = StyleSheet.create({
     lineHeight: 35,
     alignSelf: "center",
     marginVertical: 32,
+  },
+  postsWrapper: {
+    paddingHorizontal: 16,
   },
 });
